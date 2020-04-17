@@ -38,6 +38,7 @@ CRGB colorError = CRGB(2550, 0, 0);
 CRGB colorInfo = CRGB( 0, 0, 255);
 CRGB colorLightning = CRGB(210, 210, 255);
 CRGB colorBlack = CRGB(0, 0, 0);
+CRGB colorPurple = CRGB(150, 0, 190);
 
 bool lightsGoing = false;
 
@@ -79,18 +80,41 @@ bool b_finished = false; // To red
 bool c_finished = false; // Fade to black after lightning
 int c_fade = 30;
 
+int b_1_finished = false;
+int b_1b_finished = false;
+
+int b_2_finished = false;
+int b_2b_finished = false;
+
 int d_finished = 0; // 1st lightning
 int g_finished = 0; // 2nd lightning
+int h_finished = 0; // 3rd lightning
+
+int i_finished = 0; // 4th lightning
+int j_finished = 0; // 5th lightning
+int k_finished = 0; // 6th lightning
+
+int o_finished = 0; // 1st lightning
+
+int l_finished = 0; // green light
+
+int n_finished = 0; // end red light
 
 bool e_finished = false;
 
 int f_finished = 0; // the next strobe
 
+int m_finished = 0; // Red strobe
+
 #define STAGE_LED_COUNT 22
 
 int leds_stage[STAGE_LED_COUNT] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 };
 
-int a_beat = 555;
+#define BACKGROUND_LED_COUNT 7
+
+int leds_background[BACKGROUND_LED_COUNT] = { 49, 48, 47, 46, 45, 44, 43 };
+
+int a_beat = 561;
 int startBeat = 3550;
 
 
@@ -466,8 +490,17 @@ void loop()
     b_finished = true;
   }
 
-  // Lightning
-  variableOffset += 10000;
+  // first Lightning
+  variableOffset += 9700;
+
+  // Background
+  if (ms > startBeat + variableOffset && !b_1_finished) {
+    for (int i = 0; i < BACKGROUND_LED_COUNT; i++) {
+      leds[leds_background[i]] = colorPurple;
+    }
+
+    b_1_finished = true;
+  }
 
   if (ms >= startBeat + variableOffset && d_finished == 0) {
     for (int i = 0; i < STAGE_LED_COUNT; i++) {
@@ -538,7 +571,7 @@ void loop()
     }
   }
 
-  variableOffset += 7000;
+  variableOffset += 6500;
 
   // Second lightning
   if (ms >= startBeat + variableOffset && g_finished == 0) {
@@ -610,10 +643,94 @@ void loop()
     }
   }
 
-  /*variableOffset += 60000;
+  variableOffset += 8600;
+
+  // Third lightning
+  if (ms >= startBeat + variableOffset && h_finished == 0) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    h_finished++;
+  }
+
+  variableOffset += 100;
+
+  if (ms >= startBeat + variableOffset && h_finished == 1) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorBlack;
+    }
+
+    h_finished++;
+  }
+
+  variableOffset += 120;
+
+  if (ms >= startBeat + variableOffset && h_finished == 2) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    h_finished++;
+  }
+
+  variableOffset += 170;
+
+  if (ms >= startBeat + variableOffset && h_finished == 3) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorBlack;
+    }
+
+    h_finished++;
+  }
+
+  variableOffset += 90;
+
+  if (ms >= startBeat + variableOffset && h_finished == 4) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    h_finished++;
+  }
+
+  variableOffset += 120;
+
+  // Lightning fade out
+  if (ms >= startBeat + variableOffset && h_finished == 5) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= c_fade;
+      leds[leds_stage[i]].g -= c_fade;
+      leds[leds_stage[i]].b -= c_fade;
+    }
+
+    if (leds[leds_stage[0]].b <= c_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]] = colorBlack;
+      }
+
+      for (int i = 0; i < BACKGROUND_LED_COUNT; i++) {
+        leds[leds_background[i]] = colorBlack;
+      }
+    }
+  }
+
+  // Background
+  if (ms >= startBeat + variableOffset && !b_1b_finished) {
+    for (int i = 0; i < BACKGROUND_LED_COUNT; i++) {
+      leds[leds_background[i]] = colorBlack;
+    }
+
+    b_1b_finished = true;
+  }
+
+
+  variableOffset += 6000;
 
   // Orange candle glow
-  if (ms >= startBeat + variableOffset && ms <= startBeat + variableOffset + 9000) {
+  if (ms >= startBeat + variableOffset && ms <= startBeat + variableOffset + 18900) {
     for (int i = 0; i < STAGE_LED_COUNT; i++) {
       leds[leds_stage[i]].r = random(160, 240);
       leds[leds_stage[i]].g = random(110, 145);
@@ -621,10 +738,10 @@ void loop()
     }
   }
 
-  variableOffset += 22000;
+  variableOffset += 19000;
 
   // Candle fade out
-  if (ms >= startBeat + variableOffset && e_finished == 5) {
+  if (ms >= startBeat + variableOffset && e_finished == false) {
     for (int i = 0; i < STAGE_LED_COUNT; i++) {
       leds[leds_stage[i]].r -= c_fade;
       leds[leds_stage[i]].g -= c_fade;
@@ -635,18 +752,12 @@ void loop()
       e_finished++;
 
       for (int i = 0; i < STAGE_LED_COUNT; i++) {
-        leds[leds_stage[i]].r = 0;
-        leds[leds_stage[i]].g = 0;
-        leds[leds_stage[i]].b = 0;
+        leds[leds_stage[i]] = colorBlack;
       }
     }
-  }*/
-  
-  /*if (ms >= startBeat + variableOffset && f_finished == 0) {
-    leds[0].b = 255;
-  }*/
+  }
 
-  variableOffset += 10000;
+  variableOffset += 13500;
 
   if (ms >= startBeat + variableOffset && f_finished == 0) {
     if (leds[0].b <= 0) {
@@ -968,8 +1079,702 @@ void loop()
     }
   }
 
+  variableOffset += (a_beat * f_finished);
+
+  variableOffset += 4300;
+
+  // Fourth lightning
+  if (ms >= startBeat + variableOffset && i_finished == 0) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    i_finished++;
+  }
+
+  // Background
+  if (ms > startBeat + variableOffset && !b_2_finished) {
+    for (int i = 0; i < BACKGROUND_LED_COUNT; i++) {
+      leds[leds_background[i]] = colorPurple;
+    }
+
+    b_2_finished = true;
+  }
+
+  variableOffset += 100;
+
+  if (ms >= startBeat + variableOffset && i_finished == 1) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorBlack;
+    }
+
+    i_finished++;
+  }
+
+  variableOffset += 120;
+
+  if (ms >= startBeat + variableOffset && i_finished == 2) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    i_finished++;
+  }
+
+  variableOffset += 170;
+
+  if (ms >= startBeat + variableOffset && i_finished == 3) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorBlack;
+    }
+
+    i_finished++;
+  }
+
+  variableOffset += 90;
+
+  if (ms >= startBeat + variableOffset && i_finished == 4) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    i_finished++;
+  }
+
+  variableOffset += 120;
+
+  // Lightning fade out
+  if (ms >= startBeat + variableOffset && i_finished == 5) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= c_fade;
+      leds[leds_stage[i]].g -= c_fade;
+      leds[leds_stage[i]].b -= c_fade;
+    }
+
+    if (leds[leds_stage[0]].b <= c_fade) {
+      i_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+        leds[leds_stage[i]].g = 0;
+        leds[leds_stage[i]].b = 0;
+      }
+    }
+  }
+
+  variableOffset += 4400;
+
+  // Fifth lightning
+  if (ms >= startBeat + variableOffset && j_finished == 0) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    j_finished++;
+  }
+
+  variableOffset += 100;
+
+  if (ms >= startBeat + variableOffset && j_finished == 1) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorBlack;
+    }
+
+    j_finished++;
+  }
+
+  variableOffset += 120;
+
+  if (ms >= startBeat + variableOffset && j_finished == 2) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    j_finished++;
+  }
+
+  variableOffset += 170;
+
+  if (ms >= startBeat + variableOffset && j_finished == 3) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorBlack;
+    }
+
+    j_finished++;
+  }
+
+  variableOffset += 90;
+
+  if (ms >= startBeat + variableOffset && j_finished == 4) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    j_finished++;
+  }
+
+  variableOffset += 120;
+
+  // Lightning fade out
+  if (ms >= startBeat + variableOffset && j_finished == 5) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= c_fade;
+      leds[leds_stage[i]].g -= c_fade;
+      leds[leds_stage[i]].b -= c_fade;
+    }
+
+    if (leds[leds_stage[0]].b <= c_fade) {
+      j_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+        leds[leds_stage[i]].g = 0;
+        leds[leds_stage[i]].b = 0;
+      }
+    }
+  }
+
+  variableOffset += 3500;
+
+  // Sixth lightning
+  if (ms >= startBeat + variableOffset && k_finished == 0) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    k_finished++;
+  }
+
+  variableOffset += 100;
+
+  if (ms >= startBeat + variableOffset && k_finished == 1) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorBlack;
+    }
+
+    k_finished++;
+  }
+
+  variableOffset += 120;
+
+  if (ms >= startBeat + variableOffset && k_finished == 2) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    k_finished++;
+  }
+
+  variableOffset += 170;
+
+  if (ms >= startBeat + variableOffset && k_finished == 3) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorBlack;
+    }
+
+    k_finished++;
+  }
+
+  variableOffset += 90;
+
+  if (ms >= startBeat + variableOffset && k_finished == 4) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    k_finished++;
+  }
+
+  variableOffset += 120;
+
+  // Lightning fade out
+  if (ms >= startBeat + variableOffset && k_finished == 5) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= c_fade;
+      leds[leds_stage[i]].g -= c_fade;
+      leds[leds_stage[i]].b -= c_fade;
+    }
+
+    if (leds[leds_stage[0]].b <= c_fade) {
+      k_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+        leds[leds_stage[i]].g = 0;
+        leds[leds_stage[i]].b = 0;
+      }
+    }
+  }
+
+  // Background
+  if (ms >= startBeat + variableOffset && !b_2b_finished) {
+    for (int i = 0; i < BACKGROUND_LED_COUNT; i++) {
+      leds[leds_background[i]] = colorBlack;
+    }
+
+    b_2b_finished = true;
+  }
+
+  variableOffset += 2500;
+
+  // NEXT ALL green
+  if (ms >= startBeat + variableOffset && l_finished == 0) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r = 0;
+      leds[leds_stage[i]].g = 255;
+      leds[leds_stage[i]].b = 0;
+    }
+    
+    l_finished++;
+  }
+
+  variableOffset += 36000;
+
+  // NEXT ALL green
+  if (ms >= startBeat + variableOffset && l_finished == 1) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r = 0;
+      leds[leds_stage[i]].g = 0;
+      leds[leds_stage[i]].b = 0;
+    }
+    
+    l_finished++;
+  }
+
+  variableOffset += 10000;
+
+  // NEXT ALL red
+  if (ms >= startBeat + variableOffset && l_finished == 2) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r = 255;
+      leds[leds_stage[i]].g = 0;
+      leds[leds_stage[i]].b = 0;
+    }
+    
+    l_finished++;
+  }
+
+  variableOffset += 30000;
+
+  // NEXT all black
+  /*if (ms >= startBeat + variableOffset && l_finished == 3) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r = 0;
+      leds[leds_stage[i]].g = 0;
+      leds[leds_stage[i]].b = 0;
+    }
+    
+    l_finished++;
+  }*/
+
+  // Next red pulse
+  variableOffset += 14500;
+
+  if (ms >= startBeat + variableOffset && h_finished == 0) {
+    if (leds[0].r <= 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+
+      h_finished++;
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 1) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 2) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 3) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 4) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 5) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 6) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 7) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 8) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 9) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 10) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 11) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 12) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 13) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 14) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  if (ms >= startBeat + variableOffset + (a_beat * h_finished) && h_finished == 15) {
+    if (leds[0].r == 0) {
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 255;
+      }
+    }
+
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= a_fade;
+    }
+
+    if (leds[0].r <= a_fade) {
+      h_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+      }
+    }
+  }
+
+  variableOffset += (a_beat * h_finished);
 
 
+  // NEXT ALL RED
+  if (ms >= startBeat + variableOffset && n_finished == 0) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r = 255;
+      leds[leds_stage[i]].g = 0;
+      leds[leds_stage[i]].b = 0;
+    }
+    
+    n_finished++;
+  }
+
+  // seventh Lightning
+  variableOffset += 9700;
+
+  if (ms >= startBeat + variableOffset && o_finished == 0) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    o_finished++;
+  }
+
+  variableOffset += 100;
+
+  if (ms >= startBeat + variableOffset && o_finished == 1) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorBlack;
+    }
+
+    o_finished++;
+  }
+
+  variableOffset += 120;
+
+  if (ms >= startBeat + variableOffset && o_finished == 2) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    o_finished++;
+  }
+
+  variableOffset += 170;
+
+  if (ms >= startBeat + variableOffset && o_finished == 3) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorBlack;
+    }
+
+    o_finished++;
+  }
+
+  variableOffset += 90;
+
+  if (ms >= startBeat + variableOffset && o_finished == 4) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]] = colorLightning;
+    }
+
+    o_finished++;
+  }
+
+  variableOffset += 120;
+
+  // Lightning fade out
+  if (ms >= startBeat + variableOffset && o_finished == 5) {
+    for (int i = 0; i < STAGE_LED_COUNT; i++) {
+      leds[leds_stage[i]].r -= c_fade;
+      leds[leds_stage[i]].g -= c_fade;
+      leds[leds_stage[i]].b -= c_fade;
+    }
+
+    if (leds[leds_stage[0]].b <= c_fade) {
+      o_finished++;
+
+      for (int i = 0; i < STAGE_LED_COUNT; i++) {
+        leds[leds_stage[i]].r = 0;
+        leds[leds_stage[i]].g = 0;
+        leds[leds_stage[i]].b = 0;
+      }
+    }
+  }
 
   // NEXT ALL WHITE
   /*if (ms >= startBeat + variableOffset && !c_finished) {
